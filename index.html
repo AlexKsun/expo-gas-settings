@@ -6,14 +6,10 @@
     <title>万博 予約監視設定</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 簡単なアニメーション効果 */
-        .status-message {
-            transition: all 0.3s ease-in-out;
-        }
-        /* disabled状態のUIを少し薄くする */
-        fieldset:disabled {
-            opacity: 0.5;
-        }
+        fieldset:disabled { opacity: 0.5; }
+        .status-message { transition: all 0.3s ease-in-out; }
+        /* 複数選択プルダウンの高さを調整 */
+        #targetEventsSelect { height: 120px; }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
@@ -38,28 +34,38 @@
 
                 <div>
                     <label for="discordWebhookUrl" class="block text-sm font-medium text-gray-700">Discord Webhook URL</label>
-                    <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                 </div>
                 <div>
                     <label for="ticketIds" class="block text-sm font-medium text-gray-700">チケットID</label>
-                    <textarea id="ticketIds" rows="3" placeholder="チケットIDをカンマまたは改行で区切って入力" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                </div>
-                <div>
-                    <label for="targetEvents" class="block text-sm font-medium text-gray-700">対象イベントリスト</label>
-                    <textarea id="targetEvents" rows="3" placeholder="イベントの略称を改行で区切って入力&#10;(例)&#10;三菱未来館&#10;住友館" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">空欄のまま更新すると、すべてのイベントが通知対象になります。</p>
+                    <textarea id="ticketIds" rows="3" placeholder="チケットIDをカンマまたは改行で区切って入力" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"></textarea>
                 </div>
                 
+                <div>
+                    <div class="flex justify-between items-center">
+                        <label class="block text-sm font-medium text-gray-700">対象イベントリスト</label>
+                        <button id="toggleEventModeBtn" type="button" class="text-xs text-indigo-600 hover:underline">テキスト入力に切り替え</button>
+                    </div>
+
+                    <div id="eventSelectWrapper">
+                         <select id="targetEventsSelect" multiple class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                            </select>
+                         <p class="text-xs text-gray-500 mt-1">複数選択可 (Ctrl/Cmd + クリック)</p>
+                    </div>
+                    <div id="eventTextWrapper" style="display: none;">
+                        <textarea id="targetEventsText" rows="4" placeholder="イベントの略称を改行で区切って入力" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"></textarea>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">何も選択しない場合、すべてのイベントが通知対象になります。</p>
+                </div>
                 <hr/>
 
                 <div>
                     <label for="hours" class="block text-sm font-medium text-gray-700">時間制限 (何時間後までを通知対象にするか)</label>
-                    <input type="text" id="hours" placeholder="半角数字 (例: 5) または reset" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    <p class="text-xs text-gray-500 mt-1">空欄のまま更新すると「制限なし」になります。</p>
+                    <input type="text" id="hours" placeholder="半角数字 (例: 5) または reset" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm">
                 </div>
                 <div>
                     <label for="notify" class="block text-sm font-medium text-gray-700">通知の種類</label>
-                    <select id="notify" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                    <select id="notify" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 rounded-md">
                         <option value="off">🟢と🔺の両方を通知</option>
                         <option value="on">🟢空きのみ通知</option>
                     </select>
@@ -67,10 +73,10 @@
             </div>
 
             <div class="flex items-center space-x-4 pt-4">
-                <button id="updateButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button id="updateButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">
                     設定を更新
                 </button>
-                <button id="checkButton" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button id="checkButton" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                     現在の設定を確認
                 </button>
             </div>
@@ -84,63 +90,35 @@
     </div>
 
     <script>
-        let GAS_WEB_APP_URL = "";
-
-        const hoursInput = document.getElementById('hours');
-        const notifySelect = document.getElementById('notify');
-        const updateButton = document.getElementById('updateButton');
-        const checkButton = document.getElementById('checkButton');
-        const statusMessage = document.getElementById('statusMessage');
-        const urlConfigSection = document.getElementById('urlConfigSection');
+        // --- DOM要素の取得 ---
         const gasUrlInput = document.getElementById('gasUrlInput');
         const saveUrlButton = document.getElementById('saveUrlButton');
+        const urlConfigSection = document.getElementById('urlConfigSection');
         const mainControls = document.getElementById('mainControls');
         const editUrlLink = document.getElementById('editUrlLink');
+        const statusMessage = document.getElementById('statusMessage');
+        const updateButton = document.getElementById('updateButton');
+        const checkButton = document.getElementById('checkButton');
+        
         const discordWebhookUrlInput = document.getElementById('discordWebhookUrl');
         const ticketIdsInput = document.getElementById('ticketIds');
-        const targetEventsInput = document.getElementById('targetEvents');
+        const hoursInput = document.getElementById('hours');
+        const notifySelect = document.getElementById('notify');
 
-        // アプリケーションの初期化処理
-        function initializeApp() {
-            const savedUrl = localStorage.getItem('gasWebAppUrl');
-            if (savedUrl) {
-                GAS_WEB_APP_URL = savedUrl;
-                gasUrlInput.value = savedUrl;
-                urlConfigSection.style.display = 'none';
-                mainControls.disabled = false;
-                editUrlLink.style.display = 'block';
-            } else {
-                urlConfigSection.style.display = 'block';
-                mainControls.disabled = true;
-                editUrlLink.style.display = 'none';
-            }
-        }
+        // ▼▼▼ イベント設定関連の要素 ▼▼▼
+        const toggleEventModeBtn = document.getElementById('toggleEventModeBtn');
+        const eventSelectWrapper = document.getElementById('eventSelectWrapper');
+        const targetEventsSelect = document.getElementById('targetEventsSelect');
+        const eventTextWrapper = document.getElementById('eventTextWrapper');
+        const targetEventsText = document.getElementById('targetEventsText');
 
-        // URL保存ボタンの処理
-        saveUrlButton.addEventListener('click', () => {
-            const url = gasUrlInput.value.trim();
-            if (url && url.startsWith('https://script.google.com/')) {
-                localStorage.setItem('gasWebAppUrl', url);
-                initializeApp(); // UIを再初期化
-                statusMessage.textContent = 'URLを保存しました。';
-                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
-            } else {
-                statusMessage.textContent = '有効なGoogle Apps ScriptのURLを入力してください。';
-                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
-            }
-        });
+        let GAS_WEB_APP_URL = "";
+        let isDropdownMode = true; // イベント入力モードの管理
 
-        // URL再設定リンクの処理
-        editUrlLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (confirm('現在のURLを削除して再設定しますか？')) {
-                localStorage.removeItem('gasWebAppUrl');
-                initializeApp();
-            }
-        });
-
-        // GASにリクエストを送信する共通関数 (JSONP方式)
-        function sendRequest(payload) {
+        // --- 関数定義 ---
+        
+        // GASにJSONPリクエストを送信する共通関数
+        function sendRequest(payload, customCallback) {
             if (!GAS_WEB_APP_URL) {
                 statusMessage.textContent = 'エラー: GASのURLが設定されていません。';
                 return;
@@ -149,90 +127,160 @@
             statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-yellow-100 text-yellow-800';
 
             const callbackName = 'jsonp_callback_' + Date.now();
-
+            
             window[callbackName] = function(data) {
-                // 1. ステータスメッセージを表示
-                statusMessage.innerHTML = data.message.replace(/\n/g, '<br>');
-                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
-
-                // 2. data.settings が存在する場合、フォームに値を設定する
-                if (data.settings) {
-                    discordWebhookUrlInput.value = data.settings.webhook || '';
-                    ticketIdsInput.value = data.settings.ticket_ids || '';
-                    targetEventsInput.value = data.settings.events || '';
-                    // GASからnullが返ってくる可能性があるので、その場合は空文字に変換
-                    hoursInput.value = data.settings.hours !== null && data.settings.hours !== undefined ? data.settings.hours : '';
-                    notifySelect.value = data.settings.notify || 'off';
+                if (customCallback) {
+                    customCallback(data);
+                } else {
+                     statusMessage.innerHTML = data.message ? data.message.replace(/\n/g, '<br>') : '完了しました。';
+                     statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
                 }
-                
-                // 3. 後処理
                 document.body.removeChild(document.getElementById(callbackName));
                 delete window[callbackName];
             };
 
-            const params = new URLSearchParams();
-            params.append('callback', callbackName);
-            for (const key in payload) {
-                params.append(key, payload[key]);
-            }
-            
+            const params = new URLSearchParams({ callback: callbackName, ...payload });
             const script = document.createElement('script');
             script.id = callbackName;
             script.src = `${GAS_WEB_APP_URL}?${params.toString()}`;
-            
             script.onerror = () => {
-                statusMessage.textContent = 'エラー: 通信に失敗しました。GASのURLやデプロイ設定を確認してください。';
+                statusMessage.textContent = 'エラー: 通信に失敗しました。URLやデプロイ設定を確認してください。';
                 statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
                 delete window[callbackName];
             };
-
             document.body.appendChild(script);
         }
+        
+        // イベントリストを取得してプルダウンを生成する関数
+        function fetchEventList() {
+            sendRequest({ command: 'get_event_list' }, (data) => {
+                targetEventsSelect.innerHTML = ''; // プルダウンを初期化
+                if (data.eventList && data.eventList.length > 0) {
+                    data.eventList.forEach(eventName => {
+                        const option = document.createElement('option');
+                        option.value = eventName;
+                        option.textContent = eventName;
+                        targetEventsSelect.appendChild(option);
+                    });
+                    statusMessage.textContent = 'イベントリストを読み込みました。';
+                    statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-blue-100 text-blue-800';
+                } else {
+                    statusMessage.textContent = 'イベントリストが空です。スプレッドシートを確認してください。';
+                    statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-yellow-100 text-yellow-800';
+                }
+            });
+        }
 
-        // 更新ボタンがクリックされたときの処理
+        // --- 初期化処理 ---
+        function initializeApp() {
+            const savedUrl = localStorage.getItem('gasWebAppUrl');
+            if (savedUrl) {
+                GAS_WEB_APP_URL = savedUrl;
+                gasUrlInput.value = savedUrl;
+                urlConfigSection.style.display = 'none';
+                mainControls.disabled = false;
+                editUrlLink.style.display = 'block';
+                fetchEventList(); // URL設定後、イベントリストを取得
+            } else {
+                urlConfigSection.style.display = 'block';
+                mainControls.disabled = true;
+                editUrlLink.style.display = 'none';
+            }
+        }
+        
+        // --- イベントリスナー ---
+        
+        saveUrlButton.addEventListener('click', () => {
+            const url = gasUrlInput.value.trim();
+            if (url && url.startsWith('https://script.google.com/')) {
+                localStorage.setItem('gasWebAppUrl', url);
+                initializeApp();
+            } else {
+                statusMessage.textContent = '有効なGoogle Apps ScriptのURLを入力してください。';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
+            }
+        });
+
+        editUrlLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('現在のURLを削除して再設定しますか？')) {
+                localStorage.removeItem('gasWebAppUrl');
+                initializeApp();
+            }
+        });
+
+        toggleEventModeBtn.addEventListener('click', () => {
+            isDropdownMode = !isDropdownMode;
+            if (isDropdownMode) {
+                // テキストエリアの値をプルダウンに同期
+                const textValues = new Set(targetEventsText.value.split('\n').map(v => v.trim()).filter(Boolean));
+                Array.from(targetEventsSelect.options).forEach(opt => opt.selected = textValues.has(opt.value));
+                
+                eventSelectWrapper.style.display = 'block';
+                eventTextWrapper.style.display = 'none';
+                toggleEventModeBtn.textContent = 'テキスト入力に切り替え';
+            } else {
+                // プルダウンの値をテキストエリアに同期
+                const selectedValues = Array.from(targetEventsSelect.selectedOptions).map(opt => opt.value);
+                targetEventsText.value = selectedValues.join('\n');
+
+                eventSelectWrapper.style.display = 'none';
+                eventTextWrapper.style.display = 'block';
+                toggleEventModeBtn.textContent = 'プルダウン選択に切り替え';
+            }
+        });
+
+        checkButton.addEventListener('click', () => {
+            sendRequest({ command: 'check' }, (data) => {
+                statusMessage.innerHTML = data.message ? data.message.replace(/\n/g, '<br>') : '取得完了';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
+
+                if (data.settings) {
+                    discordWebhookUrlInput.value = data.settings.webhook || '';
+                    ticketIdsInput.value = data.settings.ticket_ids || '';
+                    hoursInput.value = data.settings.hours !== null && data.settings.hours !== undefined ? data.settings.hours : '';
+                    notifySelect.value = data.settings.notify || 'off';
+                    
+                    const events = data.settings.events || [];
+                    targetEventsText.value = events.join('\n'); // テキストエリアに設定
+                    const eventSet = new Set(events); // プルダウンに設定
+                    Array.from(targetEventsSelect.options).forEach(opt => opt.selected = eventSet.has(opt.value));
+                }
+            });
+        });
+
         updateButton.addEventListener('click', () => {
             let hoursValue = hoursInput.value.trim();
-            if (hoursValue.toLowerCase() === 'reset') {
-                hoursValue = '';
-            }
-            
+            if (hoursValue.toLowerCase() === 'reset') hoursValue = '';
             if (hoursValue !== '' && !/^\d+$/.test(hoursValue)) {
                 statusMessage.textContent = '時間制限は半角数字で入力してください。';
                 statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
                 return;
             }
 
-            const tasks = [];
-            const webhookUrl = discordWebhookUrlInput.value.trim();
-            if (webhookUrl) {
-                tasks.push({ command: 'set', setting: 'webhook', value: webhookUrl });
+            let eventValue;
+            if (isDropdownMode) {
+                eventValue = Array.from(targetEventsSelect.selectedOptions).map(opt => opt.value).join('\n');
+            } else {
+                eventValue = targetEventsText.value.trim();
             }
-            const ticketIds = ticketIdsInput.value.trim();
-            if (ticketIds) {
-                tasks.push({ command: 'set', setting: 'ticket_ids', value: ticketIds });
-            }
-            // 対象イベントは空でも送信して「すべて」にリセットできるようにする
-            tasks.push({ command: 'set', setting: 'events', value: targetEventsInput.value.trim() });
-            
-            tasks.push({ command: 'set', setting: 'hours', value: hoursValue });
-            tasks.push({ command: 'set', setting: 'notify', value: notifySelect.value });
+
+            const tasks = [
+                { command: 'set', setting: 'webhook', value: discordWebhookUrlInput.value.trim() },
+                { command: 'set', setting: 'ticket_ids', value: ticketIdsInput.value.trim() },
+                { command: 'set', setting: 'events', value: eventValue },
+                { command: 'set', setting: 'hours', value: hoursValue },
+                { command: 'set', setting: 'notify', value: notifySelect.value }
+            ];
 
             let delay = 0;
             tasks.forEach(task => {
-                setTimeout(() => {
-                    sendRequest(task);
-                }, delay);
-                delay += 500; // 0.5秒ずつずらしてリクエストを送信
+                setTimeout(() => sendRequest(task), delay);
+                delay += 500;
             });
         });
 
-        // 確認ボタンがクリックされたときの処理
-        checkButton.addEventListener('click', () => {
-            const payload = { command: 'check' };
-            sendRequest(payload);
-        });
-
-        // ページ読み込み時に初期化処理を実行
+        // --- 実行 ---
         initializeApp();
     </script>
 </body>
