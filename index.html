@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万博 予約監視設定</title>
+    <!-- Tailwind CSSを読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 簡単なアニメーション効果 */
+        .status-message {
+            transition: all 0.3s ease-in-out;
+        }
+        /* disabled状態のUIを少し薄くする */
+        fieldset:disabled {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+
+    <div class="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
+        <div class="text-center">
+            <h1 class="text-2xl font-bold text-gray-800">万博 予約監視設定</h1>
+            <p class="text-gray-500 mt-2">現在の設定を確認・変更します。</p>
+        </div>
+
+        <!-- ▼▼▼ 変更点: GAS URL設定エリア ▼▼▼ -->
+        <div id="urlConfigSection" class="space-y-3 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+            <label for="gasUrlInput" class="block text-sm font-medium text-gray-700">GAS Web App URL</label>
+            <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <button id="saveUrlButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                URLを保存
+            </button>
+            <p class="text-xs text-gray-500">URLはブラウザに保存され、外部には送信されません。</p>
+        </div>
+        
+        <!-- ▼▼▼ 変更点: メインの操作エリアをfieldsetで囲む ▼▼▼ -->
+        <fieldset id="mainControls">
+            <!-- 設定変更フォーム -->
+            <div class="space-y-4">
+                <div>
+                    <label for="hours" class="block text-sm font-medium text-gray-700">時間制限 (何時間後までを通知対象にするか)</label>
+                    <input type="text" id="hours" placeholder="半角数字 (例: 5) または reset" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+                    <p class="text-xs text-gray-500 mt-1">空欄のまま更新すると「制限なし」になります。</p>
+                </div>
+                <div>
+                    <label for="notify" class="block text-sm font-medium text-gray-700">通知の種類</label>
+                    <select id="notify" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+                        <option value="off">🟢と🔺の両方を通知</option>
+                        <option value="on">🟢空きのみ通知</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ボタン -->
+            <div class="flex items-center space-x-4 pt-4">
+                <button id="updateButton" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    設定を更新
+                </button>
+                <button id="checkButton" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    現在の設定を確認
+                </button>
+            </div>
+        </fieldset>
+
+        <!-- ステータスメッセージ表示エリア -->
+        <div id="statusMessage" class="status-message text-center text-sm font-medium p-3 rounded-md"></div>
+        
+        <!-- ▼▼▼ 変更点: URL再編集用のリンク ▼▼▼ -->
+        <div class="text-center">
+            <a href="#" id="editUrlLink" class="text-xs text-indigo-600 hover:underline">GAS URLを再設定</a>
+        </div>
+    </div>
+
+    <script>
+        // ▼▼▼ 変更点: URLをJavaScript変数から削除 ▼▼▼
+        let GAS_WEB_APP_URL = "";
+
+        const hoursInput = document.getElementById('hours');
+        const notifySelect = document.getElementById('notify');
+        const updateButton = document.getElementById('updateButton');
+        const checkButton = document.getElementById('checkButton');
+        const statusMessage = document.getElementById('statusMessage');
+
+        // ▼▼▼ 変更点: 新しく追加したUI要素を取得 ▼▼▼
+        const urlConfigSection = document.getElementById('urlConfigSection');
+        const gasUrlInput = document.getElementById('gasUrlInput');
+        const saveUrlButton = document.getElementById('saveUrlButton');
+        const mainControls = document.getElementById('mainControls');
+        const editUrlLink = document.getElementById('editUrlLink');
+
+        // アプリケーションの初期化処理
+        function initializeApp() {
+            const savedUrl = localStorage.getItem('gasWebAppUrl');
+            if (savedUrl) {
+                GAS_WEB_APP_URL = savedUrl;
+                gasUrlInput.value = savedUrl;
+                urlConfigSection.style.display = 'none';
+                mainControls.disabled = false;
+                editUrlLink.style.display = 'block';
+            } else {
+                urlConfigSection.style.display = 'block';
+                mainControls.disabled = true;
+                editUrlLink.style.display = 'none';
+            }
+        }
+
+        // URL保存ボタンの処理
+        saveUrlButton.addEventListener('click', () => {
+            const url = gasUrlInput.value.trim();
+            if (url && url.startsWith('https://script.google.com/')) {
+                localStorage.setItem('gasWebAppUrl', url);
+                initializeApp(); // UIを再初期化
+                statusMessage.textContent = 'URLを保存しました。';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
+            } else {
+                statusMessage.textContent = '有効なGoogle Apps ScriptのURLを入力してください。';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
+            }
+        });
+
+        // URL再設定リンクの処理
+        editUrlLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('現在のURLを削除して再設定しますか？')) {
+                localStorage.removeItem('gasWebAppUrl');
+                initializeApp();
+            }
+        });
+
+        // GASにリクエストを送信する共通関数 (JSONP方式)
+        function sendRequest(payload) {
+            if (!GAS_WEB_APP_URL) {
+                statusMessage.textContent = 'エラー: GASのURLが設定されていません。';
+                return;
+            }
+            statusMessage.innerHTML = '通信中...';
+            statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-yellow-100 text-yellow-800';
+
+            const callbackName = 'jsonp_callback_' + Date.now();
+
+            window[callbackName] = function(data) {
+                statusMessage.innerHTML = data.message.replace(/\n/g, '<br>');
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
+                document.body.removeChild(document.getElementById(callbackName));
+                delete window[callbackName];
+            };
+
+            const params = new URLSearchParams();
+            params.append('callback', callbackName);
+            for (const key in payload) {
+                params.append(key, payload[key]);
+            }
+            
+            const script = document.createElement('script');
+            script.id = callbackName;
+            script.src = `${GAS_WEB_APP_URL}?${params.toString()}`;
+            
+            script.onerror = () => {
+                statusMessage.textContent = 'エラー: 通信に失敗しました。GASのURLやデプロイ設定を確認してください。';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
+                delete window[callbackName];
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // 更新ボタンがクリックされたときの処理
+        updateButton.addEventListener('click', () => {
+            let hoursValue = hoursInput.value.trim();
+            if (hoursValue.toLowerCase() === 'reset') {
+                hoursValue = '';
+            }
+            
+            if (hoursValue !== '' && !/^\d+$/.test(hoursValue)) {
+                statusMessage.textContent = '時間制限は半角数字で入力してください。';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-red-100 text-red-800';
+                return;
+            }
+
+            const hoursPayload = { command: 'set', setting: 'hours', value: hoursValue };
+            sendRequest(hoursPayload);
+            
+            setTimeout(() => {
+                const notifyPayload = { command: 'set', setting: 'notify', value: notifySelect.value };
+                sendRequest(notifyPayload);
+            }, 500);
+        });
+
+        // 確認ボタンがクリックされたときの処理
+        checkButton.addEventListener('click', () => {
+            const payload = { command: 'check' };
+            sendRequest(payload);
+        });
+
+        // ページ読み込み時に初期化処理を実行
+        initializeApp();
+    </script>
+</body>
+</html>
