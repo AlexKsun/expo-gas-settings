@@ -8,7 +8,6 @@
     <style>
         fieldset:disabled { opacity: 0.5; }
         .status-message { transition: all 0.3s ease-in-out; }
-        /* 複数選択プルダウンの高さを調整 */
         #targetEventsSelect { height: 120px; }
     </style>
 </head>
@@ -48,15 +47,18 @@
                     </div>
 
                     <div id="eventSelectWrapper">
-                         <select id="targetEventsSelect" multiple class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                            </select>
-                         <p class="text-xs text-gray-500 mt-1">複数選択可 (Ctrl/Cmd + クリック)</p>
-                    </div>
+                         <select id="targetEventsSelect" multiple class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></select>
+                         <div class="flex items-center space-x-2 mt-2">
+                             <button id="selectAllEventsBtn" type="button" class="w-full text-xs py-1 px-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50">全選択</button>
+                             <button id="deselectAllEventsBtn" type="button" class="w-full text-xs py-1 px-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50">全解除</button>
+                         </div>
+                         </div>
                     <div id="eventTextWrapper" style="display: none;">
                         <textarea id="targetEventsText" rows="4" placeholder="イベントの略称を改行で区切って入力" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"></textarea>
                     </div>
                     <p class="text-xs text-gray-500 mt-1">何も選択しない場合、すべてのイベントが通知対象になります。</p>
                 </div>
+                
                 <hr/>
 
                 <div>
@@ -105,19 +107,20 @@
         const hoursInput = document.getElementById('hours');
         const notifySelect = document.getElementById('notify');
 
-        // ▼▼▼ イベント設定関連の要素 ▼▼▼
         const toggleEventModeBtn = document.getElementById('toggleEventModeBtn');
         const eventSelectWrapper = document.getElementById('eventSelectWrapper');
         const targetEventsSelect = document.getElementById('targetEventsSelect');
         const eventTextWrapper = document.getElementById('eventTextWrapper');
         const targetEventsText = document.getElementById('targetEventsText');
+        
+        // ▼▼▼ 追加したボタンの要素を取得 ▼▼▼
+        const selectAllEventsBtn = document.getElementById('selectAllEventsBtn');
+        const deselectAllEventsBtn = document.getElementById('deselectAllEventsBtn');
 
         let GAS_WEB_APP_URL = "";
-        let isDropdownMode = true; // イベント入力モードの管理
+        let isDropdownMode = true;
 
         // --- 関数定義 ---
-        
-        // GASにJSONPリクエストを送信する共通関数
         function sendRequest(payload, customCallback) {
             if (!GAS_WEB_APP_URL) {
                 statusMessage.textContent = 'エラー: GASのURLが設定されていません。';
@@ -151,10 +154,9 @@
             document.body.appendChild(script);
         }
         
-        // イベントリストを取得してプルダウンを生成する関数
         function fetchEventList() {
             sendRequest({ command: 'get_event_list' }, (data) => {
-                targetEventsSelect.innerHTML = ''; // プルダウンを初期化
+                targetEventsSelect.innerHTML = '';
                 if (data.eventList && data.eventList.length > 0) {
                     data.eventList.forEach(eventName => {
                         const option = document.createElement('option');
@@ -165,13 +167,12 @@
                     statusMessage.textContent = 'イベントリストを読み込みました。';
                     statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-blue-100 text-blue-800';
                 } else {
-                    statusMessage.textContent = 'イベントリストが空です。スプレッドシートを確認してください。';
+                    statusMessage.textContent = '表示可能なイベントがありません。スプレッドシートを確認してください。';
                     statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-yellow-100 text-yellow-800';
                 }
             });
         }
 
-        // --- 初期化処理 ---
         function initializeApp() {
             const savedUrl = localStorage.getItem('gasWebAppUrl');
             if (savedUrl) {
@@ -180,7 +181,7 @@
                 urlConfigSection.style.display = 'none';
                 mainControls.disabled = false;
                 editUrlLink.style.display = 'block';
-                fetchEventList(); // URL設定後、イベントリストを取得
+                fetchEventList();
             } else {
                 urlConfigSection.style.display = 'block';
                 mainControls.disabled = true;
@@ -212,24 +213,29 @@
         toggleEventModeBtn.addEventListener('click', () => {
             isDropdownMode = !isDropdownMode;
             if (isDropdownMode) {
-                // テキストエリアの値をプルダウンに同期
                 const textValues = new Set(targetEventsText.value.split('\n').map(v => v.trim()).filter(Boolean));
                 Array.from(targetEventsSelect.options).forEach(opt => opt.selected = textValues.has(opt.value));
-                
                 eventSelectWrapper.style.display = 'block';
                 eventTextWrapper.style.display = 'none';
                 toggleEventModeBtn.textContent = 'テキスト入力に切り替え';
             } else {
-                // プルダウンの値をテキストエリアに同期
                 const selectedValues = Array.from(targetEventsSelect.selectedOptions).map(opt => opt.value);
                 targetEventsText.value = selectedValues.join('\n');
-
                 eventSelectWrapper.style.display = 'none';
                 eventTextWrapper.style.display = 'block';
                 toggleEventModeBtn.textContent = 'プルダウン選択に切り替え';
             }
         });
+        
+        // ▼▼▼ 全選択・全解除ボタンのイベントリスナーを追加 ▼▼▼
+        selectAllEventsBtn.addEventListener('click', () => {
+            Array.from(targetEventsSelect.options).forEach(option => option.selected = true);
+        });
 
+        deselectAllEventsBtn.addEventListener('click', () => {
+            Array.from(targetEventsSelect.options).forEach(option => option.selected = false);
+        });
+        
         checkButton.addEventListener('click', () => {
             sendRequest({ command: 'check' }, (data) => {
                 statusMessage.innerHTML = data.message ? data.message.replace(/\n/g, '<br>') : '取得完了';
@@ -242,8 +248,8 @@
                     notifySelect.value = data.settings.notify || 'off';
                     
                     const events = data.settings.events || [];
-                    targetEventsText.value = events.join('\n'); // テキストエリアに設定
-                    const eventSet = new Set(events); // プルダウンに設定
+                    targetEventsText.value = events.join('\n');
+                    const eventSet = new Set(events);
                     Array.from(targetEventsSelect.options).forEach(opt => opt.selected = eventSet.has(opt.value));
                 }
             });
