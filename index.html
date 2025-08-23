@@ -52,7 +52,7 @@
                              <button id="selectAllEventsBtn" type="button" class="w-full text-xs py-1 px-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50">全選択</button>
                              <button id="deselectAllEventsBtn" type="button" class="w-full text-xs py-1 px-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50">全解除</button>
                          </div>
-                         </div>
+                    </div>
                     <div id="eventTextWrapper" style="display: none;">
                         <textarea id="targetEventsText" rows="4" placeholder="イベントの略称を改行で区切って入力" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm"></textarea>
                     </div>
@@ -79,7 +79,7 @@
                     設定を更新
                 </button>
                 <button id="checkButton" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
-                    現在の設定を確認
+                    設定を再読み込み
                 </button>
             </div>
         </fieldset>
@@ -113,7 +113,6 @@
         const eventTextWrapper = document.getElementById('eventTextWrapper');
         const targetEventsText = document.getElementById('targetEventsText');
         
-        // ▼▼▼ 追加したボタンの要素を取得 ▼▼▼
         const selectAllEventsBtn = document.getElementById('selectAllEventsBtn');
         const deselectAllEventsBtn = document.getElementById('deselectAllEventsBtn');
 
@@ -154,6 +153,28 @@
             document.body.appendChild(script);
         }
         
+        // ▼▼▼ 変更点: 設定読み込みのロジックを独立した関数に ▼▼▼
+        function loadCurrentSettings(isInitialLoad = false) {
+            sendRequest({ command: 'check' }, (data) => {
+                const message = isInitialLoad ? "現在の設定を読み込みました ✅" : "設定を再読み込みしました ✅";
+                statusMessage.innerHTML = data.message ? message : '取得完了';
+                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
+
+                if (data.settings) {
+                    discordWebhookUrlInput.value = data.settings.webhook || '';
+                    ticketIdsInput.value = data.settings.ticket_ids || '';
+                    hoursInput.value = data.settings.hours !== null && data.settings.hours !== undefined ? data.settings.hours : '';
+                    notifySelect.value = data.settings.notify || 'off';
+                    
+                    const events = data.settings.events || [];
+                    targetEventsText.value = events.join('\n');
+                    const eventSet = new Set(events);
+                    Array.from(targetEventsSelect.options).forEach(opt => opt.selected = eventSet.has(opt.value));
+                }
+            });
+        }
+        
+        // ▼▼▼ 変更点: イベントリスト取得完了後に設定読み込みを呼び出す ▼▼▼
         function fetchEventList() {
             sendRequest({ command: 'get_event_list' }, (data) => {
                 targetEventsSelect.innerHTML = '';
@@ -164,12 +185,12 @@
                         option.textContent = eventName;
                         targetEventsSelect.appendChild(option);
                     });
-                    statusMessage.textContent = 'イベントリストを読み込みました。';
-                    statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-blue-100 text-blue-800';
                 } else {
                     statusMessage.textContent = '表示可能なイベントがありません。スプレッドシートを確認してください。';
                     statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-yellow-100 text-yellow-800';
                 }
+                // イベントリストの描画が終わったら、現在の設定を読み込む
+                loadCurrentSettings(true);
             });
         }
 
@@ -181,6 +202,7 @@
                 urlConfigSection.style.display = 'none';
                 mainControls.disabled = false;
                 editUrlLink.style.display = 'block';
+                // ▼▼▼ 変更点: 呼び出しをfetchEventListに一本化 ▼▼▼
                 fetchEventList();
             } else {
                 urlConfigSection.style.display = 'block';
@@ -190,7 +212,6 @@
         }
         
         // --- イベントリスナー ---
-        
         saveUrlButton.addEventListener('click', () => {
             const url = gasUrlInput.value.trim();
             if (url && url.startsWith('https://script.google.com/')) {
@@ -227,7 +248,6 @@
             }
         });
         
-        // ▼▼▼ 全選択・全解除ボタンのイベントリスナーを追加 ▼▼▼
         selectAllEventsBtn.addEventListener('click', () => {
             Array.from(targetEventsSelect.options).forEach(option => option.selected = true);
         });
@@ -236,23 +256,10 @@
             Array.from(targetEventsSelect.options).forEach(option => option.selected = false);
         });
         
+        // ▼▼▼ 変更点: ボタンの役割を明確化 ▼▼▼
         checkButton.addEventListener('click', () => {
-            sendRequest({ command: 'check' }, (data) => {
-                statusMessage.innerHTML = data.message ? data.message.replace(/\n/g, '<br>') : '取得完了';
-                statusMessage.className = 'status-message text-center text-sm font-medium p-3 rounded-md bg-green-100 text-green-800';
-
-                if (data.settings) {
-                    discordWebhookUrlInput.value = data.settings.webhook || '';
-                    ticketIdsInput.value = data.settings.ticket_ids || '';
-                    hoursInput.value = data.settings.hours !== null && data.settings.hours !== undefined ? data.settings.hours : '';
-                    notifySelect.value = data.settings.notify || 'off';
-                    
-                    const events = data.settings.events || [];
-                    targetEventsText.value = events.join('\n');
-                    const eventSet = new Set(events);
-                    Array.from(targetEventsSelect.options).forEach(opt => opt.selected = eventSet.has(opt.value));
-                }
-            });
+            // 手動での再読み込みなので isInitialLoad は false
+            loadCurrentSettings(false);
         });
 
         updateButton.addEventListener('click', () => {
