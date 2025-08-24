@@ -492,77 +492,6 @@
         }
         
         /* プログレスステップ */
-        .progress-steps {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 32px;
-            padding: 0 20px;
-        }
-        
-        .progress-step {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            position: relative;
-        }
-        
-        .progress-step::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background: #e5e7eb;
-            z-index: 0;
-        }
-        
-        .progress-step:first-child::before {
-            display: none;
-        }
-        
-        .step-circle {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: #e5e7eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 12px;
-            color: #9ca3af;
-            position: relative;
-            z-index: 1;
-            transition: all 0.3s ease;
-        }
-        
-        .step-circle.active {
-            background: #4f46e5;
-            color: white;
-        }
-        
-        .step-circle.completed {
-            background: #10b981;
-            color: white;
-        }
-        
-        .step-label {
-            font-size: 11px;
-            color: #9ca3af;
-            margin-top: 6px;
-            text-align: center;
-        }
-        
-        .step-label.active {
-            color: #4f46e5;
-            font-weight: 600;
-        }
-        
-        .step-label.completed {
-            color: #10b981;
-        }
     </style>
 </head>
 <body>
@@ -594,32 +523,17 @@
             </div>
 
             <fieldset id="mainControls" style="display: none;">
-                <div class="progress-steps">
-                    <div class="progress-step">
-                        <div class="step-circle completed">1</div>
-                        <div class="step-label completed">接続</div>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-circle active">2</div>
-                        <div class="step-label active">設定</div>
-                    </div>
-                    <div class="progress-step">
-                        <div class="step-circle">3</div>
-                        <div class="step-label">完了</div>
-                    </div>
-                </div>
                 
                 <div class="card">
                     <div class="card-title">
-                        <span>💬</span>通知設定
+                        通知設定
                     </div>
                     <div class="form-section">
                         <div class="form-group">
                             <label for="discordWebhookUrl" class="form-label">
-                                <span>🔔</span>Discord Webhook URL
+                                Discord Webhook URL
                             </label>
-                            <div class="input-container input-with-icon">
-                                <span class="input-icon">💬</span>
+                            <div class="input-container">
                                 <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/..." class="form-input">
                             </div>
                             <p class="form-helper">Discord通知を受け取るためのWebhook URL</p>
@@ -627,7 +541,7 @@
                         
                         <div class="form-group">
                             <label for="ticketIds" class="form-label">
-                                <span>🎫</span>チケットID
+                                チケットID
                             </label>
                             <textarea id="ticketIds" placeholder="例：12345, 67890\nまたは改行で区切って入力" class="form-textarea"></textarea>
                             <p class="form-helper">監視したいチケットのIDをカンマまたは改行で区切って入力</p>
@@ -637,25 +551,25 @@
                 
                 <div class="card">
                     <div class="card-title">
-                        <span>📅</span>イベント設定
+                        イベント設定
                     </div>
                     <div class="form-section">
                         <div class="form-group">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                                 <label class="form-label" style="margin: 0;">
-                                    <span>🎪</span>対象イベントリスト
+                                    対象イベントリスト
                                 </label>
-                                <button id="toggleEventModeBtn" type="button" class="toggle-link">✏️ テキスト入力に切り替え</button>
+                                <button id="toggleEventModeBtn" type="button" class="toggle-link">テキスト入力に切り替え</button>
                             </div>
 
                             <div id="eventSelectWrapper">
                                  <select id="targetEventsSelect" multiple class="form-select"></select>
                                  <div class="btn-row">
                                      <button id="selectAllEventsBtn" type="button" class="btn btn-secondary">
-                                         <span class="btn-icon">✅</span>全選択
+                                         全選択
                                      </button>
                                      <button id="deselectAllEventsBtn" type="button" class="btn btn-secondary">
-                                         <span class="btn-icon">❌</span>全解除
+                                         全解除
                                      </button>
                                  </div>
                             </div>
@@ -669,15 +583,14 @@
 
                 <div class="card">
                     <div class="card-title">
-                        <span>⚙️</span>詳細設定
+                        詳細設定
                     </div>
                     <div class="form-section">
                         <div class="form-group">
                             <label for="hours" class="form-label">
-                                <span>⏰</span>時間制限
+                                時間制限
                             </label>
-                            <div class="input-container input-with-icon">
-                                <span class="input-icon">🕐</span>
+                            <div class="input-container">
                                 <input type="text" id="hours" placeholder="例: 5 (時間) または reset" class="form-input">
                             </div>
                             <p class="form-helper">何時間後までを通知対象にするか（空欄=無制限、reset=リセット）</p>
@@ -685,7 +598,7 @@
                         
                         <div class="form-group">
                             <label for="notify" class="form-label">
-                                <span>🔔</span>通知の種類
+                                通知の種類
                             </label>
                             <select id="notify" class="form-input">
                                 <option value="off">🟢 空き + 🔺 残りわずか の両方を通知</option>
@@ -695,14 +608,15 @@
                         </div>
                     </div>
 
-                    <div class="btn-group">
-                        <button id="updateButton" class="btn btn-primary">
-                            <span class="btn-icon">💾</span>設定を更新
-                        </button>
-                        <button id="checkButton" class="btn btn-secondary">
-                            <span class="btn-icon">🔄</span>設定を再読み込み
-                        </button>
-                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button id="updateButton" class="btn btn-primary">
+                        設定を更新
+                    </button>
+                    <button id="checkButton" class="btn btn-secondary">
+                        設定を再読み込み
+                    </button>
                 </div>
             </fieldset>
 
@@ -780,7 +694,6 @@
                 this.elements.mainControls.style.display = 'block';
                 this.elements.mainControls.disabled = false;
                 this.elements.editUrlLink.style.display = 'block';
-                this.updateProgressStep(2);
                 this.fetchEventList();
             }
 
@@ -1010,8 +923,7 @@
                         this.sendRequest(task, (data) => {
                             completedTasks++;
                             if (completedTasks === tasks.length) {
-                                this.updateProgressStep(3);
-                                this.showStatus('🎉 全ての設定が正常に更新されました！', 'success');
+                                this.showStatus('全ての設定が正常に更新されました！', 'success');
                             }
                         });
                     }, index * 500);
@@ -1093,28 +1005,6 @@
                 });
             }
 
-            updateProgressStep(step) {
-                const steps = document.querySelectorAll('.progress-step');
-                steps.forEach((stepEl, index) => {
-                    const circle = stepEl.querySelector('.step-circle');
-                    const label = stepEl.querySelector('.step-label');
-                    
-                    if (index < step - 1) {
-                        circle.classList.remove('active');
-                        circle.classList.add('completed');
-                        label.classList.remove('active');
-                        label.classList.add('completed');
-                    } else if (index === step - 1) {
-                        circle.classList.remove('completed');
-                        circle.classList.add('active');
-                        label.classList.remove('completed');
-                        label.classList.add('active');
-                    } else {
-                        circle.classList.remove('active', 'completed');
-                        label.classList.remove('active', 'completed');
-                    }
-                });
-            }
 
             initEventListeners() {
                 this.addInputValidation();
@@ -1131,11 +1021,10 @@
 
                 this.elements.editUrlLink.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (confirm('🔄 接続を解除してURLを再設定しますか？')) {
+                    if (confirm('接続を解除してURLを再設定しますか？')) {
                         localStorage.removeItem('gasWebAppUrl');
                         this.gasWebAppUrl = "";
                         this.showLoginScreen();
-                        this.updateProgressStep(1);
                     }
                 });
 
@@ -1143,13 +1032,13 @@
 
                 this.elements.selectAllEventsBtn.addEventListener('click', () => {
                     Array.from(this.elements.targetEventsSelect.options).forEach(option => option.selected = true);
-                    this.showStatus('✅ 全てのイベントを選択しました', 'success');
+                    this.showStatus('全てのイベントを選択しました', 'success');
                     setTimeout(() => this.elements.statusMessage.innerHTML = '', 2000);
                 });
 
                 this.elements.deselectAllEventsBtn.addEventListener('click', () => {
                     Array.from(this.elements.targetEventsSelect.options).forEach(option => option.selected = false);
-                    this.showStatus('❌ 全ての選択を解除しました', 'warning');
+                    this.showStatus('全ての選択を解除しました', 'warning');
                     setTimeout(() => this.elements.statusMessage.innerHTML = '', 2000);
                 });
 
@@ -1162,7 +1051,7 @@
                     if (discordValid && hoursValid) {
                         this.updateSettings();
                     } else {
-                        this.showStatus('❌ 入力内容に誤りがあります。赤色のフィールドを確認してください。', 'error');
+                        this.showStatus('入力内容に誤りがあります。赤色のフィールドを確認してください。', 'error');
                     }
                 });
             }
