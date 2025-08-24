@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>万博 予約監視設定</title>
-    
+
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>"">
@@ -12,15 +12,15 @@
     <style>
         /* グローバル設定 */
         * { box-sizing: border-box; }
-        
-        body { 
+
+        body {
             font-family: 'Helvetica Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             margin: 0;
             padding: 16px;
         }
-        
+
         .container {
             max-width: 420px;
             margin: 0 auto;
@@ -30,40 +30,40 @@
             overflow: hidden;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
+
         .header {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
             padding: 32px 24px 24px;
             text-align: center;
         }
-        
+
         .header h1 {
             margin: 0 0 8px;
             font-size: 24px;
             font-weight: 700;
             letter-spacing: -0.025em;
         }
-        
+
         .header p {
             margin: 0;
             opacity: 0.9;
             font-size: 14px;
         }
-        
+
         .content {
             padding: 32px 24px 24px;
         }
-        
+
         /* フォーム要素 */
         .form-group {
             margin-bottom: 28px;
         }
-        
+
         .form-group:last-child {
             margin-bottom: 0;
         }
-        
+
         .form-label {
             display: flex;
             align-items: center;
@@ -73,17 +73,17 @@
             margin-bottom: 10px;
             gap: 8px;
         }
-        
+
         .form-label-icon {
             width: 16px;
             height: 16px;
             opacity: 0.7;
         }
-        
+
         .input-container {
             position: relative;
         }
-        
+
         .form-input, .form-select, .form-textarea {
             width: 100%;
             padding: 16px 20px;
@@ -95,12 +95,12 @@
             background: #fafafa;
             line-height: 1.5;
         }
-        
+
         .form-input:hover, .form-select:hover, .form-textarea:hover {
             border-color: #d1d5db;
             background: white;
         }
-        
+
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: #4f46e5;
@@ -108,27 +108,27 @@
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
             transform: translateY(-1px);
         }
-        
+
         .form-textarea {
             resize: vertical;
             min-height: 120px;
             font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
         }
-        
+
         .form-select {
             min-height: 140px;
             font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
         }
-        
+
         /* 入力フィールドアイコン */
         .input-with-icon {
             position: relative;
         }
-        
+
         .input-with-icon .form-input {
             padding-left: 48px;
         }
-        
+
         .input-icon {
             position: absolute;
             left: 16px;
@@ -140,32 +140,32 @@
             pointer-events: none;
             z-index: 1;
         }
-        
+
         /* バリデーション状態 */
         .form-input.valid {
             border-color: #10b981;
             background: #f0fdf4;
         }
-        
+
         .form-input.invalid {
             border-color: #ef4444;
             background: #fef2f2;
         }
-        
+
         .validation-message {
             margin-top: 6px;
             font-size: 13px;
             font-weight: 500;
         }
-        
+
         .validation-message.valid {
             color: #059669;
         }
-        
+
         .validation-message.invalid {
             color: #dc2626;
         }
-        
+
         /* ボタン */
         .btn {
             display: inline-flex;
@@ -183,7 +183,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .btn::before {
             content: '';
             position: absolute;
@@ -194,64 +194,64 @@
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
             transition: left 0.5s;
         }
-        
+
         .btn:hover::before {
             left: 100%;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
             box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
         }
-        
+
         .btn-primary:hover:not(:disabled) {
             transform: translateY(-3px);
             box-shadow: 0 12px 30px rgba(79, 70, 229, 0.4);
         }
-        
+
         .btn-secondary {
             background: white;
             color: #6b7280;
             border: 2px solid #e5e7eb;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
+
         .btn-secondary:hover:not(:disabled) {
             border-color: #4f46e5;
             color: #4f46e5;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
         }
-        
+
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
         }
-        
+
         .btn-full { width: 100%; }
-        
+
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin-top: 32px;
         }
-        
+
         .btn-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-top: 12px;
         }
-        
+
         .btn-icon {
             width: 18px;
             height: 18px;
             margin-right: 8px;
         }
-        
+
         /* ローディング */
         .loading-spinner {
             display: inline-block;
@@ -263,7 +263,7 @@
             animation: spin 1s linear infinite;
             margin-right: 8px;
         }
-        
+
         .loading-spinner-input {
             width: 16px;
             height: 16px;
@@ -271,12 +271,12 @@
             border-top: 2px solid #4f46e5;
             margin: 0 auto;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
+
         /* 状態メッセージ */
         .status-message {
             padding: 16px;
@@ -287,13 +287,13 @@
             margin: 16px 0;
             text-align: center;
         }
-        
+
         .status-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
         .status-error { background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; }
         .status-warning { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
         .status-info { background: #dbeafe; color: #2563eb; border: 1px solid #bfdbfe; }
         .status-loading { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
-        
+
         /* カード */
         .card {
             background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
@@ -306,7 +306,7 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .card::before {
             content: '';
             position: absolute;
@@ -317,14 +317,14 @@
             background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4);
             border-radius: 20px 20px 0 0;
         }
-        
+
         .card:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
-        
+
         .card:last-child { margin-bottom: 0; }
-        
+
         .card-title {
             font-size: 18px;
             font-weight: 700;
@@ -334,13 +334,13 @@
             align-items: center;
             gap: 10px;
         }
-        
+
         .card-title-icon {
             width: 20px;
             height: 20px;
             opacity: 0.8;
         }
-        
+
         /* セクション */
         .section-divider {
             height: 2px;
@@ -348,7 +348,7 @@
             margin: 36px 0;
             position: relative;
         }
-        
+
         .section-divider::after {
             content: '';
             position: absolute;
@@ -360,11 +360,11 @@
             background: linear-gradient(90deg, #4f46e5, #7c3aed);
             border-radius: 2px;
         }
-        
+
         .form-section {
             padding: 24px 0;
         }
-        
+
         .form-section-title {
             font-size: 16px;
             font-weight: 700;
@@ -374,20 +374,20 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .section-icon {
             width: 18px;
             height: 18px;
             opacity: 0.7;
         }
-        
+
         /* インプットローディング状態 */
         .input-loading {
             position: relative;
             pointer-events: none;
             opacity: 0.7;
         }
-        
+
         .input-loading::after {
             content: '';
             position: absolute;
@@ -402,18 +402,18 @@
             animation: spin 1s linear infinite;
             z-index: 10;
         }
-        
+
         /* フローティングラベル効果 */
         .floating-label {
             position: relative;
         }
-        
+
         .floating-label input:focus + label,
         .floating-label input:not(:placeholder-shown) + label {
             transform: translateY(-25px) scale(0.85);
             color: #4f46e5;
         }
-        
+
         .floating-label label {
             position: absolute;
             left: 20px;
@@ -425,7 +425,7 @@
             pointer-events: none;
             color: #9ca3af;
         }
-        
+
         /* モバイル対応 */
         @media (max-width: 640px) {
             body { padding: 8px; }
@@ -440,13 +440,13 @@
             .input-with-icon .form-input { padding-left: 42px; }
             .input-icon { left: 14px; width: 18px; height: 18px; }
         }
-        
+
         @media (max-width: 480px) {
             .header h1 { font-size: 20px; }
             .form-group { margin-bottom: 20px; }
             .card { margin-bottom: 16px; }
         }
-        
+
         /* アクセシビリティ */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -455,30 +455,30 @@
                 transition-duration: 0.01ms !important;
             }
         }
-        
+
         /* フォーム無効化 */
         fieldset:disabled {
             opacity: 0.6;
             pointer-events: none;
         }
-        
+
         .form-disabled {
             opacity: 0.6;
             pointer-events: none;
             position: relative;
         }
-        
+
         .toggle-link {
             color: #4f46e5;
             text-decoration: none;
             font-size: 12px;
             font-weight: 500;
         }
-        
+
         .toggle-link:hover {
             text-decoration: underline;
         }
-        
+
         .form-helper {
             font-size: 13px;
             color: #6b7280;
@@ -488,13 +488,13 @@
             align-items: flex-start;
             gap: 6px;
         }
-        
+
         .form-helper::before {
             content: '💡';
             font-size: 12px;
             margin-top: 1px;
         }
-        
+
         /* プログレスステップ */
     </style>
 </head>
@@ -504,19 +504,18 @@
             <h1>万博 予約監視設定</h1>
             <p>現在の設定を確認・変更します</p>
         </div>
-        
+
         <div class="content">
 
             <div id="urlConfigSection" class="card">
                 <div class="card-title">
-                    <span>🔗</span>GAS接続設定
+                    GAS接続設定
                 </div>
                 <div class="form-group">
                     <label for="gasUrlInput" class="form-label">
-                        <span>🌐</span>GAS Web App URL
+                        GAS Web App URL
                     </label>
                     <div class="input-container input-with-icon">
-                        <span class="input-icon">🔗</span>
                         <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." class="form-input">
                     </div>
                     <p class="form-helper">URLはブラウザに保存され、外部には送信されません</p>
@@ -527,7 +526,7 @@
             </div>
 
             <fieldset id="mainControls" style="display: none;">
-                
+
                 <div class="card">
                     <div class="card-title">
                         通知設定
@@ -542,7 +541,7 @@
                             </div>
                             <p class="form-helper">Discord通知を受け取るためのWebhook URL</p>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="ticketIds" class="form-label">
                                 チケットID
@@ -552,7 +551,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card">
                     <div class="card-title">
                         イベント設定
@@ -599,7 +598,7 @@
                             </div>
                             <p class="form-helper">何時間後までを通知対象にするか（空欄=無制限、reset=リセット）</p>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="notify" class="form-label">
                                 通知の種類
@@ -684,7 +683,7 @@
                 this.elements.urlConfigSection.style.display = 'block';
                 this.elements.mainControls.style.display = 'none';
                 this.elements.editUrlLink.style.display = 'none';
-                
+
                 if (message) {
                     this.showStatus(message, 'error');
                 } else {
@@ -775,7 +774,7 @@
 
                 window[callbackName] = (data) => {
                     this.setLoadingState(false);
-                    
+
                     if (customCallback) {
                         customCallback(data);
                     } else {
@@ -789,7 +788,7 @@
                 const script = document.createElement('script');
                 script.id = callbackName;
                 script.src = `${this.gasWebAppUrl}?${params.toString()}`;
-                
+
                 script.onerror = () => {
                     this.setLoadingState(false);
                     this.showStatus('エラー: 通信に失敗しました。URLやデプロイ設定を確認してください。', 'error');
@@ -808,7 +807,7 @@
 
             connectToGas(url, isInitialLoad = false) {
                 this.showStatus('URLの有効性を確認中...', 'loading', true);
-                
+
                 const originalUrl = this.gasWebAppUrl;
                 this.gasWebAppUrl = url;
 
@@ -849,7 +848,7 @@
                         const events = data.settings.events || [];
                         this.elements.targetEventsText.value = events.join('\n');
                         const eventSet = new Set(events);
-                        Array.from(this.elements.targetEventsSelect.options).forEach(opt => 
+                        Array.from(this.elements.targetEventsSelect.options).forEach(opt =>
                             opt.selected = eventSet.has(opt.value)
                         );
                     }
@@ -859,7 +858,7 @@
             fetchEventList() {
                 this.sendRequest({ command: 'get_event_list' }, (data) => {
                     this.elements.targetEventsSelect.innerHTML = '';
-                    
+
                     if (data.eventList && data.eventList.length > 0) {
                         data.eventList.forEach(eventName => {
                             const option = document.createElement('option');
@@ -876,7 +875,7 @@
 
             toggleEventMode() {
                 this.isDropdownMode = !this.isDropdownMode;
-                
+
                 if (this.isDropdownMode) {
                     const textValues = new Set(
                         this.elements.targetEventsText.value
@@ -884,7 +883,7 @@
                             .map(v => v.trim())
                             .filter(Boolean)
                     );
-                    Array.from(this.elements.targetEventsSelect.options).forEach(opt => 
+                    Array.from(this.elements.targetEventsSelect.options).forEach(opt =>
                         opt.selected = textValues.has(opt.value)
                     );
                     this.elements.eventSelectWrapper.style.display = 'block';
@@ -903,13 +902,13 @@
             updateSettings() {
                 let hoursValue = this.elements.hours.value.trim();
                 if (hoursValue.toLowerCase() === 'reset') hoursValue = '';
-                
+
                 if (hoursValue !== '' && !/^\d+$/.test(hoursValue)) {
                     this.showStatus('時間制限は半角数字で入力してください。', 'error');
                     return;
                 }
 
-                const eventValue = this.isDropdownMode 
+                const eventValue = this.isDropdownMode
                     ? Array.from(this.elements.targetEventsSelect.selectedOptions).map(opt => opt.value).join('\n')
                     : this.elements.targetEventsText.value.trim();
 
@@ -961,7 +960,7 @@
             showInputValidation(input, isValid, message) {
                 const container = input.parentElement;
                 let validationMsg = container.querySelector('.validation-message');
-                
+
                 if (!validationMsg) {
                     validationMsg = document.createElement('div');
                     validationMsg.className = 'validation-message';
@@ -970,7 +969,7 @@
 
                 input.classList.remove('valid', 'invalid');
                 validationMsg.classList.remove('valid', 'invalid');
-                
+
                 if (input.value.trim()) {
                     if (isValid) {
                         input.classList.add('valid');
@@ -1051,7 +1050,7 @@
                     // バリデーションチェック
                     const discordValid = this.validateInput(this.elements.discordWebhookUrl, 'url');
                     const hoursValid = this.validateInput(this.elements.hours, 'hours');
-                    
+
                     if (discordValid && hoursValid) {
                         this.updateSettings();
                     } else {
