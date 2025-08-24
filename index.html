@@ -53,7 +53,7 @@
         
         /* フォーム要素 */
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
         
         .form-group:last-child {
@@ -61,36 +61,105 @@
         }
         
         .form-label {
-            display: block;
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            font-size: 15px;
             font-weight: 600;
-            color: #374151;
-            margin-bottom: 8px;
+            color: #1f2937;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        
+        .form-label-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        
+        .input-container {
+            position: relative;
         }
         
         .form-input, .form-select, .form-textarea {
             width: 100%;
-            padding: 12px 16px;
+            padding: 16px 20px;
             border: 2px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 16px;
             font-size: 16px;
-            transition: all 0.2s ease;
+            font-family: inherit;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #fafafa;
+            line-height: 1.5;
+        }
+        
+        .form-input:hover, .form-select:hover, .form-textarea:hover {
+            border-color: #d1d5db;
             background: white;
         }
         
         .form-input:focus, .form-select:focus, .form-textarea:focus {
             outline: none;
             border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            transform: translateY(-1px);
         }
         
         .form-textarea {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
         }
         
         .form-select {
-            min-height: 120px;
+            min-height: 140px;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+        
+        /* 入力フィールドアイコン */
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon .form-input {
+            padding-left: 48px;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        /* バリデーション状態 */
+        .form-input.valid {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        
+        .form-input.invalid {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        
+        .validation-message {
+            margin-top: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .validation-message.valid {
+            color: #059669;
+        }
+        
+        .validation-message.invalid {
+            color: #dc2626;
         }
         
         /* ボタン */
@@ -98,41 +167,61 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 14px 20px;
+            padding: 16px 24px;
             border: none;
-            border-radius: 12px;
+            border-radius: 16px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
-            min-height: 48px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 52px;
             text-decoration: none;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
         }
         
         .btn-primary {
             background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.2);
         }
         
         .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(79, 70, 229, 0.4);
         }
         
         .btn-secondary {
             background: white;
             color: #6b7280;
             border: 2px solid #e5e7eb;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
         .btn-secondary:hover:not(:disabled) {
-            border-color: #d1d5db;
-            background: #f9fafb;
+            border-color: #4f46e5;
+            color: #4f46e5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
         }
         
         .btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none !important;
         }
@@ -142,15 +231,21 @@
         .btn-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 24px;
+            gap: 16px;
+            margin-top: 32px;
         }
         
         .btn-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-top: 8px;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .btn-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
         }
         
         /* ローディング */
@@ -197,40 +292,134 @@
         
         /* カード */
         .card {
-            background: #f8fafc;
+            background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
             border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 28px;
             margin-bottom: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed, #06b6d4);
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
         }
         
         .card:last-child { margin-bottom: 0; }
         
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-title-icon {
+            width: 20px;
+            height: 20px;
+            opacity: 0.8;
+        }
+        
         /* セクション */
         .section-divider {
-            height: 1px;
+            height: 2px;
             background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
-            margin: 32px 0;
+            margin: 36px 0;
+            position: relative;
+        }
+        
+        .section-divider::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5, #7c3aed);
+            border-radius: 2px;
+        }
+        
+        .form-section {
+            padding: 24px 0;
+        }
+        
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .section-icon {
+            width: 18px;
+            height: 18px;
+            opacity: 0.7;
         }
         
         /* インプットローディング状態 */
         .input-loading {
             position: relative;
             pointer-events: none;
+            opacity: 0.7;
         }
         
         .input-loading::after {
             content: '';
             position: absolute;
             top: 50%;
-            right: 16px;
+            right: 20px;
             transform: translateY(-50%);
-            width: 16px;
-            height: 16px;
+            width: 18px;
+            height: 18px;
             border: 2px solid #e5e7eb;
             border-top: 2px solid #4f46e5;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+            z-index: 10;
+        }
+        
+        /* フローティングラベル効果 */
+        .floating-label {
+            position: relative;
+        }
+        
+        .floating-label input:focus + label,
+        .floating-label input:not(:placeholder-shown) + label {
+            transform: translateY(-25px) scale(0.85);
+            color: #4f46e5;
+        }
+        
+        .floating-label label {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            padding: 0 8px;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            color: #9ca3af;
         }
         
         /* モバイル対応 */
@@ -239,8 +428,19 @@
             .container { border-radius: 16px; }
             .header { padding: 24px 20px 20px; }
             .content { padding: 24px 20px 20px; }
-            .btn { font-size: 16px; min-height: 44px; }
-            .form-input, .form-select, .form-textarea { font-size: 16px; }
+            .btn { font-size: 16px; min-height: 48px; padding: 14px 20px; }
+            .form-input, .form-select, .form-textarea { font-size: 16px; padding: 14px 18px; }
+            .card { padding: 20px; }
+            .btn-group { grid-template-columns: 1fr; gap: 12px; }
+            .progress-steps { display: none; }
+            .input-with-icon .form-input { padding-left: 42px; }
+            .input-icon { left: 14px; width: 18px; height: 18px; }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 { font-size: 20px; }
+            .form-group { margin-bottom: 20px; }
+            .card { margin-bottom: 16px; }
         }
         
         /* アクセシビリティ */
@@ -276,9 +476,92 @@
         }
         
         .form-helper {
-            font-size: 12px;
+            font-size: 13px;
             color: #6b7280;
-            margin-top: 4px;
+            margin-top: 6px;
+            line-height: 1.4;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        
+        .form-helper::before {
+            content: '💡';
+            font-size: 12px;
+            margin-top: 1px;
+        }
+        
+        /* プログレスステップ */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding: 0 20px;
+        }
+        
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+        
+        .progress-step:first-child::before {
+            display: none;
+        }
+        
+        .step-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: #9ca3af;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+        
+        .step-circle.active {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .step-circle.completed {
+            background: #10b981;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 6px;
+            text-align: center;
+        }
+        
+        .step-label.active {
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        
+        .step-label.completed {
+            color: #10b981;
         }
     </style>
 </head>
@@ -292,69 +575,134 @@
         <div class="content">
 
             <div id="urlConfigSection" class="card">
+                <div class="card-title">
+                    <span>🔗</span>GAS接続設定
+                </div>
                 <div class="form-group">
-                    <label for="gasUrlInput" class="form-label">GAS Web App URL</label>
-                    <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." class="form-input">
+                    <label for="gasUrlInput" class="form-label">
+                        <span>🌐</span>GAS Web App URL
+                    </label>
+                    <div class="input-container input-with-icon">
+                        <span class="input-icon">🔗</span>
+                        <input type="url" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." class="form-input">
+                    </div>
                     <p class="form-helper">URLはブラウザに保存され、外部には送信されません</p>
                 </div>
                 <button id="saveUrlButton" class="btn btn-primary btn-full">
-                    接続して保存
+                    <span class="btn-icon">🚀</span>接続して保存
                 </button>
             </div>
 
             <fieldset id="mainControls" style="display: none;">
-                <div class="form-group">
-                    <label for="discordWebhookUrl" class="form-label">Discord Webhook URL</label>
-                    <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/..." class="form-input">
+                <div class="progress-steps">
+                    <div class="progress-step">
+                        <div class="step-circle completed">1</div>
+                        <div class="step-label completed">接続</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle active">2</div>
+                        <div class="step-label active">設定</div>
+                    </div>
+                    <div class="progress-step">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">完了</div>
+                    </div>
                 </div>
                 
-                <div class="form-group">
-                    <label for="ticketIds" class="form-label">チケットID</label>
-                    <textarea id="ticketIds" placeholder="チケットIDをカンマまたは改行で区切って入力" class="form-textarea"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        <label class="form-label" style="margin: 0;">対象イベントリスト</label>
-                        <button id="toggleEventModeBtn" type="button" class="toggle-link">テキスト入力に切り替え</button>
+                <div class="card">
+                    <div class="card-title">
+                        <span>💬</span>通知設定
                     </div>
-
-                    <div id="eventSelectWrapper">
-                         <select id="targetEventsSelect" multiple class="form-select"></select>
-                         <div class="btn-row">
-                             <button id="selectAllEventsBtn" type="button" class="btn btn-secondary">全選択</button>
-                             <button id="deselectAllEventsBtn" type="button" class="btn btn-secondary">全解除</button>
-                         </div>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="discordWebhookUrl" class="form-label">
+                                <span>🔔</span>Discord Webhook URL
+                            </label>
+                            <div class="input-container input-with-icon">
+                                <span class="input-icon">💬</span>
+                                <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/..." class="form-input">
+                            </div>
+                            <p class="form-helper">Discord通知を受け取るためのWebhook URL</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="ticketIds" class="form-label">
+                                <span>🎫</span>チケットID
+                            </label>
+                            <textarea id="ticketIds" placeholder="例：12345, 67890\nまたは改行で区切って入力" class="form-textarea"></textarea>
+                            <p class="form-helper">監視したいチケットのIDをカンマまたは改行で区切って入力</p>
+                        </div>
                     </div>
-                    <div id="eventTextWrapper" style="display: none;">
-                        <textarea id="targetEventsText" placeholder="イベントの略称を改行で区切って入力" class="form-textarea"></textarea>
-                    </div>
-                    <p class="form-helper">何も選択しない場合、すべてのイベントが通知対象になります</p>
-                </div>
-
-                <div class="section-divider"></div>
-
-                <div class="form-group">
-                    <label for="hours" class="form-label">時間制限</label>
-                    <input type="text" id="hours" placeholder="半角数字 (例: 5) または reset" class="form-input">
-                    <p class="form-helper">何時間後までを通知対象にするか</p>
                 </div>
                 
-                <div class="form-group">
-                    <label for="notify" class="form-label">通知の種類</label>
-                    <select id="notify" class="form-input">
-                        <option value="off">🟢と🔺の両方を通知</option>
-                        <option value="on">🟢空きのみ通知</option>
-                    </select>
+                <div class="card">
+                    <div class="card-title">
+                        <span>📅</span>イベント設定
+                    </div>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <label class="form-label" style="margin: 0;">
+                                    <span>🎪</span>対象イベントリスト
+                                </label>
+                                <button id="toggleEventModeBtn" type="button" class="toggle-link">✏️ テキスト入力に切り替え</button>
+                            </div>
+
+                            <div id="eventSelectWrapper">
+                                 <select id="targetEventsSelect" multiple class="form-select"></select>
+                                 <div class="btn-row">
+                                     <button id="selectAllEventsBtn" type="button" class="btn btn-secondary">
+                                         <span class="btn-icon">✅</span>全選択
+                                     </button>
+                                     <button id="deselectAllEventsBtn" type="button" class="btn btn-secondary">
+                                         <span class="btn-icon">❌</span>全解除
+                                     </button>
+                                 </div>
+                            </div>
+                            <div id="eventTextWrapper" style="display: none;">
+                                <textarea id="targetEventsText" placeholder="例：\n水族館\n遊園地\nパビリオンA" class="form-textarea"></textarea>
+                            </div>
+                            <p class="form-helper">何も選択しない場合、すべてのイベントが通知対象になります</p>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="btn-group">
-                    <button id="updateButton" class="btn btn-primary">
-                        設定を更新
-                    </button>
-                    <button id="checkButton" class="btn btn-secondary">
-                        設定を再読み込み
-                    </button>
+                <div class="card">
+                    <div class="card-title">
+                        <span>⚙️</span>詳細設定
+                    </div>
+                    <div class="form-section">
+                        <div class="form-group">
+                            <label for="hours" class="form-label">
+                                <span>⏰</span>時間制限
+                            </label>
+                            <div class="input-container input-with-icon">
+                                <span class="input-icon">🕐</span>
+                                <input type="text" id="hours" placeholder="例: 5 (時間) または reset" class="form-input">
+                            </div>
+                            <p class="form-helper">何時間後までを通知対象にするか（空欄=無制限、reset=リセット）</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notify" class="form-label">
+                                <span>🔔</span>通知の種類
+                            </label>
+                            <select id="notify" class="form-input">
+                                <option value="off">🟢 空き + 🔺 残りわずか の両方を通知</option>
+                                <option value="on">🟢 空きがある場合のみ通知</option>
+                            </select>
+                            <p class="form-helper">どの状態の時に通知を受け取るか選択</p>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button id="updateButton" class="btn btn-primary">
+                            <span class="btn-icon">💾</span>設定を更新
+                        </button>
+                        <button id="checkButton" class="btn btn-secondary">
+                            <span class="btn-icon">🔄</span>設定を再読み込み
+                        </button>
+                    </div>
                 </div>
             </fieldset>
 
@@ -432,6 +780,7 @@
                 this.elements.mainControls.style.display = 'block';
                 this.elements.mainControls.disabled = false;
                 this.elements.editUrlLink.style.display = 'block';
+                this.updateProgressStep(2);
                 this.fetchEventList();
             }
 
@@ -655,27 +1004,138 @@
                     { command: 'set', setting: 'notify', value: this.elements.notify.value }
                 ];
 
+                let completedTasks = 0;
                 tasks.forEach((task, index) => {
-                    setTimeout(() => this.sendRequest(task), index * 500);
+                    setTimeout(() => {
+                        this.sendRequest(task, (data) => {
+                            completedTasks++;
+                            if (completedTasks === tasks.length) {
+                                this.updateProgressStep(3);
+                                this.showStatus('🎉 全ての設定が正常に更新されました！', 'success');
+                            }
+                        });
+                    }, index * 500);
+                });
+            }
+
+            validateInput(input, type) {
+                const value = input.value.trim();
+                let isValid = false;
+                let message = '';
+
+                switch (type) {
+                    case 'url':
+                        isValid = value === '' || (value.startsWith('https://') && value.includes('.'));
+                        message = isValid ? '' : '有効なHTTPS URLを入力してください';
+                        break;
+                    case 'gas-url':
+                        isValid = value === '' || value.startsWith('https://script.google.com/');
+                        message = isValid ? '' : 'Google Apps ScriptのURLを入力してください';
+                        break;
+                    case 'hours':
+                        isValid = value === '' || value.toLowerCase() === 'reset' || /^\d+$/.test(value);
+                        message = isValid ? '' : '半角数字または"reset"を入力してください';
+                        break;
+                }
+
+                this.showInputValidation(input, isValid, message);
+                return isValid;
+            }
+
+            showInputValidation(input, isValid, message) {
+                const container = input.parentElement;
+                let validationMsg = container.querySelector('.validation-message');
+                
+                if (!validationMsg) {
+                    validationMsg = document.createElement('div');
+                    validationMsg.className = 'validation-message';
+                    container.appendChild(validationMsg);
+                }
+
+                input.classList.remove('valid', 'invalid');
+                validationMsg.classList.remove('valid', 'invalid');
+                
+                if (input.value.trim()) {
+                    if (isValid) {
+                        input.classList.add('valid');
+                        validationMsg.classList.add('valid');
+                        validationMsg.textContent = '✓ 正しい形式です';
+                    } else {
+                        input.classList.add('invalid');
+                        validationMsg.classList.add('invalid');
+                        validationMsg.textContent = message;
+                    }
+                } else {
+                    validationMsg.textContent = '';
+                }
+            }
+
+            addInputValidation() {
+                // URL検証
+                this.elements.gasUrlInput.addEventListener('input', () => {
+                    this.validateInput(this.elements.gasUrlInput, 'gas-url');
+                });
+
+                this.elements.discordWebhookUrl.addEventListener('input', () => {
+                    this.validateInput(this.elements.discordWebhookUrl, 'url');
+                });
+
+                this.elements.hours.addEventListener('input', () => {
+                    this.validateInput(this.elements.hours, 'hours');
+                });
+
+                // Enter キーでフォーム送信
+                this.elements.gasUrlInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.elements.saveUrlButton.click();
+                    }
+                });
+            }
+
+            updateProgressStep(step) {
+                const steps = document.querySelectorAll('.progress-step');
+                steps.forEach((stepEl, index) => {
+                    const circle = stepEl.querySelector('.step-circle');
+                    const label = stepEl.querySelector('.step-label');
+                    
+                    if (index < step - 1) {
+                        circle.classList.remove('active');
+                        circle.classList.add('completed');
+                        label.classList.remove('active');
+                        label.classList.add('completed');
+                    } else if (index === step - 1) {
+                        circle.classList.remove('completed');
+                        circle.classList.add('active');
+                        label.classList.remove('completed');
+                        label.classList.add('active');
+                    } else {
+                        circle.classList.remove('active', 'completed');
+                        label.classList.remove('active', 'completed');
+                    }
                 });
             }
 
             initEventListeners() {
+                this.addInputValidation();
+
                 this.elements.saveUrlButton.addEventListener('click', () => {
                     const url = this.elements.gasUrlInput.value.trim();
-                    if (url && url.startsWith('https://script.google.com/')) {
+                    if (this.validateInput(this.elements.gasUrlInput, 'gas-url') && url) {
                         this.connectToGas(url);
-                    } else {
-                        this.showStatus('有効なGoogle Apps ScriptのURLを入力してください。', 'error');
+                    } else if (!url) {
+                        this.showStatus('GAS Web App URLを入力してください。', 'error');
+                        this.elements.gasUrlInput.focus();
                     }
                 });
 
                 this.elements.editUrlLink.addEventListener('click', (e) => {
                     e.preventDefault();
-                    if (confirm('接続を解除してURLを再設定しますか？')) {
+                    if (confirm('🔄 接続を解除してURLを再設定しますか？')) {
                         localStorage.removeItem('gasWebAppUrl');
                         this.gasWebAppUrl = "";
                         this.showLoginScreen();
+                        this.updateProgressStep(1);
                     }
                 });
 
@@ -683,14 +1143,28 @@
 
                 this.elements.selectAllEventsBtn.addEventListener('click', () => {
                     Array.from(this.elements.targetEventsSelect.options).forEach(option => option.selected = true);
+                    this.showStatus('✅ 全てのイベントを選択しました', 'success');
+                    setTimeout(() => this.elements.statusMessage.innerHTML = '', 2000);
                 });
 
                 this.elements.deselectAllEventsBtn.addEventListener('click', () => {
                     Array.from(this.elements.targetEventsSelect.options).forEach(option => option.selected = false);
+                    this.showStatus('❌ 全ての選択を解除しました', 'warning');
+                    setTimeout(() => this.elements.statusMessage.innerHTML = '', 2000);
                 });
 
                 this.elements.checkButton.addEventListener('click', () => this.loadCurrentSettings(false));
-                this.elements.updateButton.addEventListener('click', () => this.updateSettings());
+                this.elements.updateButton.addEventListener('click', () => {
+                    // バリデーションチェック
+                    const discordValid = this.validateInput(this.elements.discordWebhookUrl, 'url');
+                    const hoursValid = this.validateInput(this.elements.hours, 'hours');
+                    
+                    if (discordValid && hoursValid) {
+                        this.updateSettings();
+                    } else {
+                        this.showStatus('❌ 入力内容に誤りがあります。赤色のフィールドを確認してください。', 'error');
+                    }
+                });
             }
 
             initializeApp() {
