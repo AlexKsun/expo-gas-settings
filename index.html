@@ -495,6 +495,82 @@
             margin-top: 1px;
         }
 
+        /* チケットID管理 */
+        .ticket-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .ticket-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .ticket-item:hover {
+            background: #f3f4f6;
+        }
+
+        .ticket-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .ticket-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            padding: 4px 0;
+            outline: none;
+        }
+
+        .ticket-remove {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .ticket-remove:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .add-ticket-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .add-ticket-btn:hover {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+
         /* プログレスステップ */
     </style>
 </head>
@@ -543,11 +619,16 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="ticketIds" class="form-label">
+                            <label class="form-label">
                                 チケットID
                             </label>
-                            <textarea id="ticketIds" placeholder="例：12345, 67890\nまたは改行で区切って入力" class="form-textarea"></textarea>
-                            <p class="form-helper">監視したいチケットのIDをカンマまたは改行で区切って入力</p>
+                            <div id="ticketList" class="ticket-list">
+                                <!-- チケットアイテムが動的に追加されます -->
+                            </div>
+                            <button type="button" id="addTicketBtn" class="add-ticket-btn">
+                                ＋ チケットIDを追加
+                            </button>
+                            <p class="form-helper">チケットのIDを追加してください (通知メッセージ内に予約画面へのダイレクトリンクを生成します)</p>
                         </div>
                     </div>
                 </div>
@@ -652,7 +733,8 @@
                     updateButton: document.getElementById('updateButton'),
                     checkButton: document.getElementById('checkButton'),
                     discordWebhookUrl: document.getElementById('discordWebhookUrl'),
-                    ticketIds: document.getElementById('ticketIds'),
+                    ticketList: document.getElementById('ticketList'),
+                    addTicketBtn: document.getElementById('addTicketBtn'),
                     hours: document.getElementById('hours'),
                     notify: document.getElementById('notify'),
                     toggleEventModeBtn: document.getElementById('toggleEventModeBtn'),
@@ -663,6 +745,79 @@
                     selectAllEventsBtn: document.getElementById('selectAllEventsBtn'),
                     deselectAllEventsBtn: document.getElementById('deselectAllEventsBtn')
                 };
+                this.ticketIds = [];
+            }
+
+            addTicketItem(id = '') {
+                const ticketItem = document.createElement('div');
+                ticketItem.className = 'ticket-item';
+                ticketItem.innerHTML = `
+                    <input type="text" class="ticket-input" placeholder="チケットID を入力" value="${id}" data-index="${this.ticketIds.length}">
+                    <button type="button" class="ticket-remove">×</button>
+                `;
+
+                const input = ticketItem.querySelector('.ticket-input');
+                const removeBtn = ticketItem.querySelector('.ticket-remove');
+
+                input.addEventListener('input', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    this.ticketIds[index] = e.target.value.trim();
+                });
+
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.addTicketItem();
+                    }
+                });
+
+                removeBtn.addEventListener('click', () => {
+                    const index = parseInt(input.dataset.index);
+                    this.removeTicketItem(index, ticketItem);
+                });
+
+                this.elements.ticketList.appendChild(ticketItem);
+                this.ticketIds.push(id);
+
+                // 新しく追加した場合はフォーカス
+                if (!id) {
+                    input.focus();
+                }
+
+                this.updateTicketIndices();
+            }
+
+            removeTicketItem(index, element) {
+                this.ticketIds.splice(index, 1);
+                element.remove();
+                this.updateTicketIndices();
+            }
+
+            updateTicketIndices() {
+                const inputs = this.elements.ticketList.querySelectorAll('.ticket-input');
+                inputs.forEach((input, index) => {
+                    input.dataset.index = index;
+                });
+            }
+
+            getTicketIdsString() {
+                return this.ticketIds.filter(id => id.trim()).join(',');
+            }
+
+            loadTicketIds(ticketIdsString) {
+                // 既存のアイテムをクリア
+                this.elements.ticketList.innerHTML = '';
+                this.ticketIds = [];
+
+                if (ticketIdsString) {
+                    const ids = ticketIdsString.split(/[,\n]/).map(id => id.trim()).filter(Boolean);
+                    ids.forEach(id => this.addTicketItem(id));
+                }
+
+                // 少なくとも1つの空のアイテムを表示
+                if (this.ticketIds.length === 0) {
+                    this.addTicketItem();
+                }
             }
 
             showStatus(message, type = 'info', withSpinner = false) {
@@ -704,12 +859,15 @@
                 const formInputs = [
                     this.elements.gasUrlInput,
                     this.elements.discordWebhookUrl,
-                    this.elements.ticketIds,
                     this.elements.hours,
                     this.elements.notify,
                     this.elements.targetEventsSelect,
                     this.elements.targetEventsText
                 ];
+
+                // チケット入力フィールドも含める
+                const ticketInputs = this.elements.ticketList.querySelectorAll('.ticket-input');
+                formInputs.push(...ticketInputs);
 
                 const buttons = [
                     this.elements.saveUrlButton,
@@ -717,8 +875,13 @@
                     this.elements.checkButton,
                     this.elements.toggleEventModeBtn,
                     this.elements.selectAllEventsBtn,
-                    this.elements.deselectAllEventsBtn
+                    this.elements.deselectAllEventsBtn,
+                    this.elements.addTicketBtn
                 ];
+
+                // チケット削除ボタンも含める
+                const ticketRemoveButtons = this.elements.ticketList.querySelectorAll('.ticket-remove');
+                buttons.push(...ticketRemoveButtons);
 
                 if (isLoading) {
                     // フォーム要素を無効化してスピナーを表示
@@ -841,7 +1004,7 @@
 
                     if (data.settings) {
                         this.elements.discordWebhookUrl.value = data.settings.webhook || '';
-                        this.elements.ticketIds.value = data.settings.ticket_ids || '';
+                        this.loadTicketIds(data.settings.ticket_ids || '');
                         this.elements.hours.value = data.settings.hours !== null && data.settings.hours !== undefined ? data.settings.hours : '';
                         this.elements.notify.value = data.settings.notify || 'off';
 
@@ -914,7 +1077,7 @@
 
                 const tasks = [
                     { command: 'set', setting: 'webhook', value: this.elements.discordWebhookUrl.value.trim() },
-                    { command: 'set', setting: 'ticket_ids', value: this.elements.ticketIds.value.trim() },
+                    { command: 'set', setting: 'ticket_ids', value: this.getTicketIdsString() },
                     { command: 'set', setting: 'events', value: eventValue },
                     { command: 'set', setting: 'hours', value: hoursValue },
                     { command: 'set', setting: 'notify', value: this.elements.notify.value }
@@ -1012,6 +1175,11 @@
             initEventListeners() {
                 this.addInputValidation();
 
+                // チケット追加ボタン
+                this.elements.addTicketBtn.addEventListener('click', () => {
+                    this.addTicketItem();
+                });
+
                 this.elements.saveUrlButton.addEventListener('click', () => {
                     const url = this.elements.gasUrlInput.value.trim();
                     if (this.validateInput(this.elements.gasUrlInput, 'gas-url') && url) {
@@ -1060,6 +1228,9 @@
             }
 
             initializeApp() {
+                // 初期チケット入力欄を追加
+                this.addTicketItem();
+
                 const savedUrl = localStorage.getItem('gasWebAppUrl');
                 if (savedUrl) {
                     this.elements.gasUrlInput.value = savedUrl;
